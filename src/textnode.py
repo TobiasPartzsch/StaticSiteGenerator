@@ -1,14 +1,24 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import StrEnum
 from typing import Optional
 
-class TextType(Enum):
+from leafnode import LeafNode
+
+class TextType(StrEnum):
     NORMAL = "Normal text"
     BOLD = "**Bold text**"
     ITALIC = "_Italic text_"
     CODE = "`Code text`"
     LINK = "Links, in this format: [anchor text](url)"
     IMAGE = "Images, in this format: ![alt text](url)"
+
+class Tags(StrEnum):
+    NORMAL = ''
+    BOLD = "b"
+    ITALIC = "i"
+    CODE = "code"
+    LINK = "a"
+    IMAGE = "img"
 
 
 @dataclass
@@ -27,4 +37,21 @@ class TextNode:
 
     def __repr__(self):
         return f"TextNode({self.text}, {self.text_type}, {self.url})"
-    
+
+
+def text_node_to_html_node(text_node: TextNode) -> LeafNode:
+    match text_node.text_type:
+        case TextType.NORMAL:
+            return LeafNode.text_only(text_node.text)
+        case TextType.BOLD:
+            return LeafNode(str(Tags.BOLD), text_node.text)
+        case TextType.ITALIC:
+            return LeafNode(str(Tags.ITALIC), text_node.text)
+        case TextType.CODE:
+            return LeafNode(str(Tags.CODE),text_node.text)
+        case TextType.LINK:
+            return LeafNode(str(Tags.LINK), text_node.text, {'href': text_node.url or ''})
+        case TextType.IMAGE:
+            return LeafNode(str(Tags.IMAGE), '', {"src": text_node.url or '', "alt": text_node.text or ''})
+        case _:
+            raise ValueError(f"Unkown text type: {text_node.text_type}")

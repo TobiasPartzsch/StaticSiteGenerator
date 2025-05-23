@@ -18,3 +18,4 @@ class ParentNode(HTMLNode):
         if self.children is None:
             raise ValueError("Parent nodes need children (even if the list is empty)")
         return f"<{self.tag}>{''.join(child.to_html() for child in self.children)}</{self.tag}>"
+
