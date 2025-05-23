@@ -1,10 +1,8 @@
-from dataclasses import dataclass
 from typing import Optional
 
 from htmlnode import HTMLNode
 
 
-@dataclass
 class LeafNode(HTMLNode):
     def __init__(
             self,
