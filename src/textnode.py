@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 from enum import StrEnum
 from itertools import chain
@@ -82,9 +83,13 @@ def split_node_on_delimiter(text_node: TextNode, delimiter: str, text_type: Text
     if text_node.text_type != TextType.NORMAL:
         return (text_node, )
     parts = text_node.text.split(delimiter)
+    print(parts)
     if not len(parts) % 2:  # even parts mean unmatched delimiters
         raise ValueError(UNMATCHED_DELIMITER_ERROR_MSG.format(delimiter=delimiter, text=text_node.text))
     return (
         TextNode(part, TextType.NORMAL if i % 2 == 0 else text_type)
         for i, part in enumerate(parts)
     )
+
+def extract_markdown_images(text: str) -> list[tuple[str, str]]:
+    return re.findall("", text)

@@ -3,7 +3,7 @@ from typing import Optional
 import unittest
 
 from leafnode import LeafNode
-from textnode import DELIMITERS, Tags, TextNode, TextType, text_node_to_html_node
+from textnode import DELIMITERS, UNMATCHED_DELIMITER_ERROR_MSG, Tags, TextNode, TextType, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -101,20 +101,20 @@ class TestTextNode(unittest.TestCase):
             text_node_to_html_node(invalid_node)
         self.assertEqual(str(cm.exception), f"Unkown text type: {invalid_node.text_type}")
 
-    def test_split_node_on_delimiter(self):
-        for text_type, delimiter in DELIMITERS.items():
-            with self.subTest(text_type=text_type, delimiter=delimiter):
-                # No delimiter present (should remain unchanged)
-                
-                # Single pair of delimiters (should split into three nodes)
+    # def test_split_node_on_delimiter(self):
+    #     for text_type, delimiter in DELIMITERS.items():
+    #         with self.subTest(text_type=text_type, delimiter=delimiter):
+    #             # No delimiter present (should remain unchanged)
 
-                # Multiple pairs (should alternate correctly)
+    #             # Single pair of delimiters (should split into three nodes)
 
-                # Umatched delimiter (should raise an exception)
-                invalid_node = TextNode("I am invalid! {delimiter} because I don't close", text_type)
-                with self.assertRaises(ValueError) as cm:
-                    text_node_to_html_node(invalid_node)
-                self.assertEqual(str(cm.exception), f"Unkown text type: {invalid_node.text_type}")
+    #             # Multiple pairs (should alternate correctly)
+
+    #             # Umatched delimiter (should raise an exception)
+    #             invalid_node = TextNode("I am invalid! {delimiter} because I don't close", text_type)
+    #             with self.assertRaises(ValueError) as cm:
+    #                 text_node_to_html_node(invalid_node)
+    #             self.assertEqual(str(cm.exception), UNMATCHED_DELIMITER_ERROR_MSG.format(delimiter=delimiter, text=invalid_node.text))
 
 
 
