@@ -3,7 +3,7 @@ from typing import Optional
 import unittest
 
 from leafnode import LeafNode
-from textnode import Tags, TextNode, TextType, text_node_to_html_node
+from textnode import DELIMITERS, Tags, TextNode, TextType, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
@@ -100,6 +100,23 @@ class TestTextNode(unittest.TestCase):
         with self.assertRaises(ValueError) as cm:
             text_node_to_html_node(invalid_node)
         self.assertEqual(str(cm.exception), f"Unkown text type: {invalid_node.text_type}")
+
+    def test_split_node_on_delimiter(self):
+        for text_type, delimiter in DELIMITERS.items():
+            with self.subTest(text_type=text_type, delimiter=delimiter):
+                # No delimiter present (should remain unchanged)
+                
+                # Single pair of delimiters (should split into three nodes)
+
+                # Multiple pairs (should alternate correctly)
+
+                # Umatched delimiter (should raise an exception)
+                invalid_node = TextNode("I am invalid! {delimiter} because I don't close", text_type)
+                with self.assertRaises(ValueError) as cm:
+                    text_node_to_html_node(invalid_node)
+                self.assertEqual(str(cm.exception), f"Unkown text type: {invalid_node.text_type}")
+
+
 
 
 @dataclass
