@@ -3,7 +3,7 @@ from typing import Optional
 import unittest
 
 from leafnode import LeafNode
-from textnode import DELIMITERS, UNMATCHED_DELIMITER_ERROR_MSG, Tags, TextNode, TextType, text_node_to_html_node
+from textnode import Tags, TextNode, TextType, text_node_to_html_node
 
 
 class TestTextNode(unittest.TestCase):
