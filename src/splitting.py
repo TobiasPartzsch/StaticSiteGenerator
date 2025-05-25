@@ -1,3 +1,4 @@
+from itertools import chain
 import re
 from typing import Iterable
 from textnode import TextNode, TextType

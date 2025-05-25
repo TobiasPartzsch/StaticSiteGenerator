@@ -1,8 +1,6 @@
-import re
 from dataclasses import dataclass
 from enum import StrEnum
-from itertools import chain
-from typing import Iterable, Optional
+from typing import Optional
 
 from leafnode import LeafNode
 
@@ -63,33 +61,3 @@ def text_node_to_html_node(text_node: TextNode) -> LeafNode:
             return LeafNode(str(Tags.IMAGE), '', {"src": text_node.url or '', "alt": text_node.text or ''})
         case _:
             raise ValueError(f"Unkown text type: {text_node.text_type}")
-
-def split_nodes_delimiter(old_nodes:list[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
-    """Split plain text depending on delimiter. Other types of TextNode won't be changed.
-    """
-    return list(
-        chain.from_iterable(
-            (
-                (node,) if node.text_type != TextType.NORMAL
-                else split_node_on_delimiter(node, delimiter, text_type)
-                for node in old_nodes
-            )
-        )
-    )
-
-UNMATCHED_DELIMITER_ERROR_MSG = "Unmatched delimters {delimiter} in text {text_node.text}"
-
-def split_node_on_delimiter(text_node: TextNode, delimiter: str, text_type: TextType) -> Iterable["TextNode"]:
-    if text_node.text_type != TextType.NORMAL:
-        return (text_node, )
-    parts = text_node.text.split(delimiter)
-    print(parts)
-    if not len(parts) % 2:  # even parts mean unmatched delimiters
-        raise ValueError(UNMATCHED_DELIMITER_ERROR_MSG.format(delimiter=delimiter, text=text_node.text))
-    return (
-        TextNode(part, TextType.NORMAL if i % 2 == 0 else text_type)
-        for i, part in enumerate(parts)
-    )
-
-def extract_markdown_images(text: str) -> list[tuple[str, str]]:
-    return re.findall("", text)
