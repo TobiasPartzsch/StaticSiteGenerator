@@ -49,7 +49,7 @@ class TestTextNode(unittest.TestCase):
     def test_text_node_to_HTML_node(self):
         test_cases:tuple["TestCase", ...] = (
             TestCase(
-                input=Input(text="This is a text node", text_type=TextType.NORMAL),
+                input=Input(text="This is a text node", text_type=TextType.TEXT),
             ),
             TestCase(
                 input=Input(text="This is a bold text node", text_type=TextType.BOLD),

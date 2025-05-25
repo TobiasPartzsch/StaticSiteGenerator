@@ -5,7 +5,7 @@ from typing import Optional
 from leafnode import LeafNode
 
 class TextType(StrEnum):
-    NORMAL = "Normal text"
+    TEXT = "Normal text"
     BOLD = "**Bold text**"
     ITALIC = "_Italic text_"
     CODE = "`Code text`"
@@ -47,7 +47,7 @@ class TextNode:
 
 def text_node_to_html_node(text_node: TextNode) -> LeafNode:
     match text_node.text_type:
-        case TextType.NORMAL:
+        case TextType.TEXT:
             return LeafNode.text_only(text_node.text)
         case TextType.BOLD:
             return LeafNode(str(Tags.BOLD), text_node.text)
