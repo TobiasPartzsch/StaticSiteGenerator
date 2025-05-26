@@ -1,7 +1,7 @@
 from itertools import chain
 import re
 from typing import Callable, Iterable
-from textnode import TextNode, TextType
+from textnode import DELIMITERS, TextNode, TextType
 
 
 def split_nodes_delimiter(old_nodes: Iterable[TextNode], delimiter: str, text_type: TextType) -> list[TextNode]:
@@ -64,3 +64,14 @@ def split_nodes(
         if tail:
             nodes_to_process.insert(0, TextNode(tail, TextType.TEXT))
     return processed_nodes
+
+def text_to_textnodes(text: str) -> list[TextNode]:
+    text_nodes = [TextNode(text, TextType.TEXT)]
+    for text_type, delimiter in DELIMITERS.items():
+        text_nodes = split_nodes_delimiter(text_nodes, delimiter, text_type)
+
+    return split_nodes_image(
+        split_nodes_link(
+            text_nodes
+        )
+    )
