@@ -13,7 +13,7 @@ class TextType(StrEnum):
     IMAGE = "Images, in this format: ![alt text](url)"
 
 class Tags(StrEnum):
-    NORMAL = ''
+    TEXT = ''
     BOLD = "b"
     ITALIC = "i"
     CODE = "code"

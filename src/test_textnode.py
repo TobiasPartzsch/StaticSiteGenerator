@@ -9,7 +9,7 @@ from textnode import Tags, TextNode, TextType, text_node_to_html_node
 class TestTextNode(unittest.TestCase):
     def test_eq(self):
         test_name = "This is a text node"
-        test_type = TextType.BOLD
+        test_type = TextType.TEXT
         node = TextNode(test_name, test_type)
         node2 = TextNode(test_name, test_type)
         self.assertEqual(node, node2)
