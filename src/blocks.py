@@ -15,7 +15,7 @@ class BlockType(StrEnum):
 def block_to_block_type(block: str) -> BlockType:
     if not block:
         # empty paragraph
-        block_type = BlockType.PARAGRAPH
+        return BlockType.PARAGRAPH
 
     match block[0]:
         case BlockType.HEADING:
@@ -40,7 +40,7 @@ def __is_heading(block: str) -> bool:
     if len(block) < 3:
         return False
     idx = 1
-    while block[idx] == BlockType.HEADING and idx < MAX_HEADER_LEVELS:
+    while idx < len(block) and idx < MAX_HEADER_LEVELS and block[idx] == BlockType.HEADING:
         idx +=1
     if len(block) < idx + 2:
         # need at least two more characters if this is a heading
