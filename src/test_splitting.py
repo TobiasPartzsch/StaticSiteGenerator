@@ -1,6 +1,6 @@
 import unittest
 from splitting import UNMATCHED_DELIMITER_ERROR_MSG, extract_markdown_images, extract_markdown_links, markdown_to_blocks, split_node_on_delimiter, split_nodes_image, text_to_textnodes
-from testscenarios import TextSplittingScenario, run_subtest_cases
+from testscenarios import StringConversionScenario, run_subtest_cases
 from textnode import DELIMITERS, TextNode, TextType
 
 
@@ -94,11 +94,13 @@ class TestSplitting(unittest.TestCase):
         )
 
     def test_markdown_to_blocks(self):
+        SplitTestScenario = StringConversionScenario[list[str]]
+
         test_cases = {
-            "empty_string": TextSplittingScenario("", []),
-            "whitespace_blocks": TextSplittingScenario("block1\n\n   \n\nblock2", ["block1", "block2"]),
-            "bolded pararaph": TextSplittingScenario(
-                input="""
+            "empty_string": SplitTestScenario("", []),
+            "whitespace_blocks": SplitTestScenario("block1\n\n   \n\nblock2", ["block1", "block2"]),
+            "bolded pararaph": SplitTestScenario(
+                """
 This is **bolded** paragraph
 
 This is another paragraph with _italic_ text and `code` here
@@ -107,35 +109,35 @@ This is the same paragraph on a new line
 - This is a list
 - with items
 """,
-                expected=[
+                [
                     "This is **bolded** paragraph",
                     "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
                     "- This is a list\n- with items",
                 ],
             ),
-            "starts with newline": TextSplittingScenario(
-                input="""
+            "starts with newline": SplitTestScenario(
+                """
 
 This is another paragraph with _italic_ text and `code` here
 This is the same paragraph on a new line
 """,
-                expected=[
+                [
                     "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line"
                 ],
             ),
-            "ends with newline": TextSplittingScenario(
-                input="""
+            "ends with newline": SplitTestScenario(
+                """
 This is another paragraph with _italic_ text and `code` here
 This is the same paragraph on a new line
 
 
 """,
-                expected=[
+                [
                     "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
                 ],
             ),
-            "multiple_blank_lines": TextSplittingScenario("block1\n\n\n\n\nblock2", ["block1", "block2"]),
-            "whitespace_only": TextSplittingScenario("   \n\n   ", []),
+            "multiple_blank_lines": SplitTestScenario("block1\n\n\n\n\nblock2", ["block1", "block2"]),
+            "whitespace_only": SplitTestScenario("   \n\n   ", []),
         }
         
         run_subtest_cases(self, markdown_to_blocks, test_cases)
