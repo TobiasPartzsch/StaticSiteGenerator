@@ -1,5 +1,6 @@
 import unittest
-from splitting import UNMATCHED_DELIMITER_ERROR_MSG, extract_markdown_images, extract_markdown_links, split_node_on_delimiter, split_nodes_image, text_to_textnodes
+from splitting import UNMATCHED_DELIMITER_ERROR_MSG, extract_markdown_images, extract_markdown_links, markdown_to_blocks, split_node_on_delimiter, split_nodes_image, text_to_textnodes
+from testscenarios import TestScenario, run_subtest_cases
 from textnode import DELIMITERS, TextNode, TextType
 
 
@@ -92,3 +93,53 @@ class TestSplitting(unittest.TestCase):
             text_to_textnodes(text)
         )
 
+    def test_markdown_to_blocks(self):
+        test_cases = {
+            "empty_string": TestScenario("", []),
+            "whitespace_blocks": TestScenario("block1\n\n   \n\nblock2", ["block1", "block2"]),
+            "bolded pararaph": TestScenario(
+                input="""
+This is **bolded** paragraph
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+- This is a list
+- with items
+""",
+                expected=[
+                    "This is **bolded** paragraph",
+                    "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                    "- This is a list\n- with items",
+                ],
+            ),
+            "starts with newline": TestScenario(
+                input="""
+
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+""",
+                expected=[
+                    "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line"
+                ],
+            ),
+            "ends with newline": TestScenario(
+                input="""
+This is another paragraph with _italic_ text and `code` here
+This is the same paragraph on a new line
+
+
+""",
+                expected=[
+                    "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
+                ],
+            ),
+            "multiple_blank_lines": TestScenario("block1\n\n\n\n\nblock2", ["block1", "block2"]),
+            "whitespace_only": TestScenario("   \n\n   ", []),
+        }
+        
+        run_subtest_cases(self, markdown_to_blocks, test_cases)
+
+
+    # Multiple consecutive blank lines between blocks?
+    # A string with no blocks at all?
