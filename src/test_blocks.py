@@ -1,153 +1,96 @@
-from dataclasses import dataclass
-from typing import Optional
 import unittest
 
-from leafnode import LeafNode
-from textnode import Tags, TextNode, TextType, text_node_to_html_node
+from blocks import BlockType, block_to_block_type
+from testscenarios import StringConversionScenario, run_subtest_cases
+
+
+BlockTestScenario = StringConversionScenario[BlockType]
 
 
 class TestBlockToBlockType(unittest.TestCase):
-    def test_eq(self):
-        test_name = "This is a text node"
-        test_type = TextType.TEXT
-        node = TextNode(test_name, test_type)
-        node2 = TextNode(test_name, test_type)
-        self.assertEqual(node, node2)
+    def test_headings(self):
+        test_cases = {
+            "h1": BlockTestScenario("# Heading 1", BlockType.HEADING),
+            "h2": BlockTestScenario("## Heading 2", BlockType.HEADING),
+            "h6": BlockTestScenario("###### Heading 6", BlockType.HEADING),
+            "heading with extra text": BlockTestScenario("### Hello World!", BlockType.HEADING),
+            "not heading no space": BlockTestScenario("#NoSpace", BlockType.PARAGRAPH),
+            "not heading too many": BlockTestScenario("####### Too many hashes", BlockType.PARAGRAPH),
+            "not heading zero": BlockTestScenario("Heading without hash", BlockType.PARAGRAPH),
+        }
+        run_subtest_cases(self, block_to_block_type, test_cases)
 
-        # different text name
-        test_name = "This is a text node"
-        test_type = TextType.BOLD
-        node = TextNode(test_name, test_type)
-        node2 = TextNode(test_name * 2, test_type)
-        self.assertNotEqual(node, node2)
+    def test_code_blocks(self):
+        test_cases = {
+            "simple code": BlockTestScenario("```\nprint('hello')\n```", BlockType.CODE),
+            "multiline code": BlockTestScenario("```\nline1\nline2\nline3\n```", BlockType.CODE),
+            "empty code": BlockTestScenario("```\n```", BlockType.CODE),
+            "not code missing end": BlockTestScenario("```\ncode without end", BlockType.PARAGRAPH),
+            "not code missing start": BlockTestScenario("code without start\n```", BlockType.PARAGRAPH),
+        }
+        run_subtest_cases(self, block_to_block_type, test_cases)
 
-        # different text type
-        test_name = "This is a text node"
-        test_type1 = TextType.BOLD
-        test_type2 = TextType.LINK
-        node = TextNode(test_name, test_type1)
-        node2 = TextNode(test_name, test_type2)
-        self.assertNotEqual(node, node2)
+    def test_quote_blocks(self):
+        test_cases = {
+            "simple quote": BlockTestScenario("> Don't worry, be happy", BlockType.QUOTE),
+            "multiline quote": BlockTestScenario("> Line 1\n> Line 2", BlockType.QUOTE),
+            "empty quote": BlockTestScenario(">", BlockType.QUOTE),  # Test this edge case
+            "quote with space": BlockTestScenario("> ", BlockType.QUOTE),  # And this one
+            "mixed invalid": BlockTestScenario("> Quote line\nNot quote", BlockType.PARAGRAPH),
+            "missing gt": BlockTestScenario("Not a quote", BlockType.PARAGRAPH),
+        }
+        run_subtest_cases(self, block_to_block_type, test_cases)
 
-        # explicit equal url
-        test_name = "This is a text node"
-        test_type = TextType.BOLD
-        url = "some url"
-        node = TextNode(test_name, test_type, url)
-        node2 = TextNode(test_name, test_type, url)
-        self.assertEqual(node, node2)
+    def test_unordered_list_blocks(self):
+        test_cases = {
+            "single item": BlockTestScenario("- Item 1", BlockType.UNORDERED_LIST),
+            "multiple items": BlockTestScenario("- Item 1\n- Item 2\n- Item 3", BlockType.UNORDERED_LIST),
+            "with spaces": BlockTestScenario("-   Item with extra spaces", BlockType.UNORDERED_LIST),
+            "empty item": BlockTestScenario("- ", BlockType.UNORDERED_LIST),
+            "no space after dash": BlockTestScenario("-Item", BlockType.PARAGRAPH),
+            "mixed valid invalid": BlockTestScenario("- Item 1\nNot a list item", BlockType.PARAGRAPH),
+            "some lines missing dash": BlockTestScenario("- Item 1\n- Item 2\nPlain text", BlockType.PARAGRAPH),
+            "starts with text": BlockTestScenario("Not a list\n- Item 1", BlockType.PARAGRAPH),
+        }        
+        run_subtest_cases(self, block_to_block_type, test_cases)
 
-        # explicit different url
-        test_name = "This is a text node"
-        test_type = TextType.BOLD
-        url1 = "some url"
-        url2 = "some other url"
-        node = TextNode(test_name, test_type, url1)
-        node2 = TextNode(test_name, test_type, url2)
-        self.assertNotEqual(node, node2)
+    def test_ordered_lists(self):
+        test_cases = {
+            "single item": BlockTestScenario("1. First item", BlockType.ORDERED_LIST),
+            "multiple items": BlockTestScenario("1. First\n2. Second\n3. Third", BlockType.ORDERED_LIST),
+            "with extra spaces": BlockTestScenario("1.   Item with spaces", BlockType.ORDERED_LIST),
+            "empty item": BlockTestScenario("1. ", BlockType.ORDERED_LIST),
+            
+            # Invalid cases - should be PARAGRAPH
+            "starts with 0": BlockTestScenario("0. Zero start", BlockType.PARAGRAPH),
+            "starts with 2": BlockTestScenario("2. Wrong start", BlockType.PARAGRAPH),
+            "skips number": BlockTestScenario("1. First\n3. Skipped two", BlockType.PARAGRAPH),
+            "wrong sequence": BlockTestScenario("1. First\n2. Second\n4. Wrong", BlockType.PARAGRAPH),
+            "no space after period": BlockTestScenario("1.NoSpace", BlockType.PARAGRAPH),
+            "no period": BlockTestScenario("1 No period", BlockType.PARAGRAPH),
+            "mixed with text": BlockTestScenario("1. First\nPlain text", BlockType.PARAGRAPH),
+            "some lines not numbered": BlockTestScenario("1. First\n2. Second\n- Not numbered", BlockType.PARAGRAPH),
+            "double digits": BlockTestScenario("1. First\n2. Second\n10. Jump to ten", BlockType.PARAGRAPH),
+        }
+        run_subtest_cases(self, block_to_block_type, test_cases)
 
-    def test_text_node_to_HTML_node(self):
-        test_cases:tuple["TestCase", ...] = (
-            TestCase(
-                input=Input(text="This is a text node", text_type=TextType.TEXT),
-            ),
-            TestCase(
-                input=Input(text="This is a bold text node", text_type=TextType.BOLD),
-            ),
-            TestCase(
-                input=Input(text="This is an italic text node", text_type=TextType.ITALIC),
-            ),
-            TestCase(
-                input=Input(text="This is an code text node", text_type=TextType.CODE),
-            ),
-            TestCase(
-                input=Input(text="This is an link text node", text_type=TextType.LINK, url="some url"),
-            ),
-            TestCase(
-                input=Input(text="This is an image text node", text_type=TextType.IMAGE, url="some url"),
-            ),
-        )
-
-        # Get attributes once from the class and ignore protected attributes
-        html_attrs = {attr for attr in dir(LeafNode) if not attr.startswith('_')}
-        expected_attrs = {attr for attr in dir(Expected) if not attr.startswith('_')}
-        # Expected should be a subset of LeafNode's attributes
-        self.assertTrue(
-            expected_attrs.issubset(html_attrs), 
-            "Expected attributes should be available on LeafNode"
-            )
-
-        for test_case in test_cases:
-            with self.subTest(node_type=test_case.input.text_type):
-                # Convert the input to a TextNode, then to HTMLNode
-                text_node = TextNode(
-                    test_case.input.text,
-                    test_case.input.text_type,
-                    test_case.input.url
-                    )
-                html_node = text_node_to_html_node(text_node)
-                
-                # Get the expected result from your computed property
-                expected = test_case.expected
-                
-                # Assert they match
-                self.assertEqual(html_node.tag, expected.tag)
-                self.assertEqual(html_node.value, expected.value)
-                self.assertEqual(html_node.props, expected.props)
-
-    def test_unknown_text_type_raises_exception(self):
-        invalid_node = TextNode("I am invalid!", 'haha') # type: ignore
-        with self.assertRaises(ValueError) as cm:
-            text_node_to_html_node(invalid_node)
-        self.assertEqual(str(cm.exception), f"Unkown text type: {invalid_node.text_type}")
-
-
-@dataclass
-class Input:
-    text: str
-    text_type: TextType
-    url: Optional[str] = None
-
-@dataclass
-class Expected:
-    tag: Optional[str]
-    value: str
-    props: Optional[dict[str, str]] = None
-
-@dataclass
-class TestCase:
-    input: Input
-    # expected_props: Optional[dict[str, str]] = None
-
-    @property
-    def expected(self):
-        return Expected(
-            tag=self.expected_tag,
-            value=self.expected_value,
-            props=self.expected_props
-            )
-    
-    @property
-    def expected_tag(self):
-        return Tags[self.input.text_type.name].value
-
-    @property
-    def expected_value(self) -> str:
-        # Images use empty string, all other types use the input text
-        if self.input.text_type == TextType.IMAGE:
-            return ""
-        return self.input.text
-
-    @property
-    def expected_props(self) -> Optional[dict[str, str]]:
-        match self.input.text_type:
-            case TextType.LINK:
-                return {"href": self.input.url or ''}
-            case TextType.IMAGE:
-                return {"src": self.input.url or '', "alt": self.input.text}
-            case _:
-                return None
-
+    def test_paragraphs(self):
+        test_cases = {
+            "simple text": BlockTestScenario("Just some plain text", BlockType.PARAGRAPH),
+            "multiline text": BlockTestScenario("Line 1\nLine 2\nLine 3", BlockType.PARAGRAPH),
+            "text with markdown": BlockTestScenario("This has **bold** and *italic* text", BlockType.PARAGRAPH),
+            "numbers and symbols": BlockTestScenario("Some text with 123 and @#$ symbols", BlockType.PARAGRAPH),
+            "special characters": BlockTestScenario("Text with ñ, é, ü, and 中文", BlockType.PARAGRAPH),
+            "punctuation heavy": BlockTestScenario("Lots of punctuation!!! What? Yes... (maybe)", BlockType.PARAGRAPH),
+            "urls and emails": BlockTestScenario("Visit https://example.com or email test@example.com", BlockType.PARAGRAPH),
+            "mixed symbols": BlockTestScenario("$100 + 50% = good deal & more @ store", BlockType.PARAGRAPH),
+            "almost heading": BlockTestScenario("#but no space after", BlockType.PARAGRAPH),
+            "almost list": BlockTestScenario("- but\nno dash on second line", BlockType.PARAGRAPH),
+            "almost code": BlockTestScenario("```missing end", BlockType.PARAGRAPH),
+            "empty string": BlockTestScenario("", BlockType.PARAGRAPH),
+            "just whitespace": BlockTestScenario("   \t  ", BlockType.PARAGRAPH),  # If whitespace isn't stripped
+        }
+        run_subtest_cases(self, block_to_block_type, test_cases)
 
 if __name__ == "__main__":
     unittest.main()
