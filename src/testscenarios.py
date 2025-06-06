@@ -1,18 +1,27 @@
-from typing import Callable, NamedTuple
+from typing import Callable, NamedTuple, TypeVar
 from unittest import TestCase
 
-class TestScenario(NamedTuple):
+from blocks import BlockType
+
+T = TypeVar('T')
+
+
+class TextSplittingScenario(NamedTuple):
     input: str
     expected: list[str]
+
+class BlockToBlockTypeScenario(NamedTuple):
+    input: str
+    expected: BlockType
 
 
 def run_subtest_cases(
     test_instance: TestCase,
-    test_function: Callable[[str], list[str]],
-    test_cases: dict[str, TestScenario]
+    test_function: Callable[[str], T],
+    test_cases: dict[str, tuple[str, T]]
 ) -> None:
-    """Helper to run multiple test cases as subtests"""
-    for case_name, case_data in test_cases.items():
+    """Generic helper to run multiple test cases as subtests"""
+    for case_name, (input_data, expected) in test_cases.items():
         with test_instance.subTest(case=case_name):
-            result = test_function(case_data.input)
-            test_instance.assertEqual(result, case_data.expected)
+            result = test_function(input_data)
+            test_instance.assertEqual(result, expected)

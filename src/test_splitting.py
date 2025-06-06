@@ -1,6 +1,6 @@
 import unittest
 from splitting import UNMATCHED_DELIMITER_ERROR_MSG, extract_markdown_images, extract_markdown_links, markdown_to_blocks, split_node_on_delimiter, split_nodes_image, text_to_textnodes
-from testscenarios import TestScenario, run_subtest_cases
+from testscenarios import TextSplittingScenario, run_subtest_cases
 from textnode import DELIMITERS, TextNode, TextType
 
 
@@ -95,9 +95,9 @@ class TestSplitting(unittest.TestCase):
 
     def test_markdown_to_blocks(self):
         test_cases = {
-            "empty_string": TestScenario("", []),
-            "whitespace_blocks": TestScenario("block1\n\n   \n\nblock2", ["block1", "block2"]),
-            "bolded pararaph": TestScenario(
+            "empty_string": TextSplittingScenario("", []),
+            "whitespace_blocks": TextSplittingScenario("block1\n\n   \n\nblock2", ["block1", "block2"]),
+            "bolded pararaph": TextSplittingScenario(
                 input="""
 This is **bolded** paragraph
 
@@ -113,7 +113,7 @@ This is the same paragraph on a new line
                     "- This is a list\n- with items",
                 ],
             ),
-            "starts with newline": TestScenario(
+            "starts with newline": TextSplittingScenario(
                 input="""
 
 This is another paragraph with _italic_ text and `code` here
@@ -123,7 +123,7 @@ This is the same paragraph on a new line
                     "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line"
                 ],
             ),
-            "ends with newline": TestScenario(
+            "ends with newline": TextSplittingScenario(
                 input="""
 This is another paragraph with _italic_ text and `code` here
 This is the same paragraph on a new line
@@ -134,8 +134,8 @@ This is the same paragraph on a new line
                     "This is another paragraph with _italic_ text and `code` here\nThis is the same paragraph on a new line",
                 ],
             ),
-            "multiple_blank_lines": TestScenario("block1\n\n\n\n\nblock2", ["block1", "block2"]),
-            "whitespace_only": TestScenario("   \n\n   ", []),
+            "multiple_blank_lines": TextSplittingScenario("block1\n\n\n\n\nblock2", ["block1", "block2"]),
+            "whitespace_only": TextSplittingScenario("   \n\n   ", []),
         }
         
         run_subtest_cases(self, markdown_to_blocks, test_cases)
