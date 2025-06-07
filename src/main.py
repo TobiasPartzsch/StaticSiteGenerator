@@ -5,7 +5,7 @@ from generator import generate_pages_recursive
 
 dir_path_static = "./static"
 dir_path_content = "./content"
-dir_path_output = "./doc"
+dir_path_output = "./docs"
 
 
 def main():
