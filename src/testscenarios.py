@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from typing import Callable, Generic, Mapping, TypeVar
 from unittest import TestCase
 
-
+# Define the type variable T just before the function or inside it if possible
+# (though defining it before is more common for function-level generics)
 T = TypeVar('T')
 
 @dataclass(frozen=True)
