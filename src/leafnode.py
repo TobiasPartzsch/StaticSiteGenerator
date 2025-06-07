@@ -12,6 +12,10 @@ class LeafNode(HTMLNode):
         ):
         super().__init__(tag=tag, children=None, value=value, props=props)
 
+    def __repr__(self):
+        return (f"LeafNode(tag={repr(self.tag)}, value={repr(self.value)}, "
+                f"props={repr(self.props)})")
+
     @classmethod
     def text_only(cls, value: str):
         return cls(tag='', value=value)
