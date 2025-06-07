@@ -29,8 +29,8 @@ def generate_page(
 
     template_content = template_content.replace("{{ Title }}", title)
     template_content = template_content.replace("{{ Content }}", content)
-    template_content = template_content.replace("href=\"/", "href=\"{basepath}")
-    template_content = template_content.replace("src=\"/", "src=\"{basepath}")
+    template_content = template_content.replace("href=\"/", f"href=\"{basepath}")
+    template_content = template_content.replace("src=\"/", f"src=\"{basepath}")
 
     # make sure dest_path directory exists
     dest_dir = os.path.dirname(dest_path)

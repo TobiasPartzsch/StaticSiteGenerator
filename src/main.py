@@ -4,15 +4,17 @@ from generator import generate_pages_recursive
 
 
 dir_path_static = "./static"
-dir_path_public = "./public"
+dir_path_content = "./content"
+dir_path_output = "./doc"
 
 
 def main():
-    basepath = sys.argv[0] or '/'
+    basepath = sys.argv[1] if len(sys.argv) >1 else '/'
+    print(f"basepath is {basepath}")
 
-    print("Copying static files to public directory...")
-    copy_dir(dir_path_static, dir_path_public)
-    generate_pages_recursive("content", "template.html", "public", basepath)
+    print("Copying static files to output directory...")
+    copy_dir(dir_path_static, dir_path_output)
+    generate_pages_recursive(dir_path_content, "template.html", dir_path_output, basepath)
 
 
 if __name__ == "__main__":
