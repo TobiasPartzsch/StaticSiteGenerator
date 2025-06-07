@@ -1,6 +1,6 @@
 import unittest
 from splitting import UNMATCHED_DELIMITER_ERROR_MSG, extract_markdown_images, extract_markdown_links, markdown_to_blocks, split_node_on_delimiter, split_nodes_image, text_to_textnodes
-from testscenarios import StringConversionScenario, run_subtest_cases
+from testscenarios import StringConversionScenario, run_subtest_cases_equal
 from textnode import DELIMITERS, TextNode, TextType
 
 
@@ -140,7 +140,7 @@ This is the same paragraph on a new line
             "whitespace_only": SplitTestScenario("   \n\n   ", []),
         }
         
-        run_subtest_cases(self, markdown_to_blocks, test_cases)
+        run_subtest_cases_equal(self, markdown_to_blocks, test_cases)
 
 
     # Multiple consecutive blank lines between blocks?

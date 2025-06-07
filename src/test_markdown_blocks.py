@@ -4,7 +4,7 @@ from htmlnode import HTMLNode, Tags
 from leafnode import LeafNode
 from markdown_blocks import BlockType, block_to_block_type, block_to_html_node, text_to_children
 from parentnode import ParentNode
-from testscenarios import StringConversionScenario, run_subtest_cases
+from testscenarios import StringConversionScenario, run_subtest_cases_equal
 
 
 class TestBlockToBlockType(unittest.TestCase):
@@ -27,7 +27,7 @@ class TestBlockToBlockType(unittest.TestCase):
                 "not heading zero": self.BlockTypeTestScenario("Heading without hash", BlockType.PARAGRAPH),
             }
         )
-        run_subtest_cases(self, block_to_block_type, test_cases)
+        run_subtest_cases_equal(self, block_to_block_type, test_cases)
 
     def test_code_blocks(self):
         test_cases = {
@@ -37,7 +37,7 @@ class TestBlockToBlockType(unittest.TestCase):
             "not code missing end": self.BlockTypeTestScenario("```\ncode without end", BlockType.PARAGRAPH),
             "not code missing start": self.BlockTypeTestScenario("code without start\n```", BlockType.PARAGRAPH),
         }
-        run_subtest_cases(self, block_to_block_type, test_cases)
+        run_subtest_cases_equal(self, block_to_block_type, test_cases)
 
     def test_quote_blocks(self):
         test_cases = {
@@ -48,7 +48,7 @@ class TestBlockToBlockType(unittest.TestCase):
             "mixed invalid": self.BlockTypeTestScenario("> Quote line\nNot quote", BlockType.PARAGRAPH),
             "missing gt": self.BlockTypeTestScenario("Not a quote", BlockType.PARAGRAPH),
         }
-        run_subtest_cases(self, block_to_block_type, test_cases)
+        run_subtest_cases_equal(self, block_to_block_type, test_cases)
 
     def test_unordered_list_blocks(self):
         test_cases = {
@@ -61,7 +61,7 @@ class TestBlockToBlockType(unittest.TestCase):
             "some lines missing dash": self.BlockTypeTestScenario("- Item 1\n- Item 2\nPlain text", BlockType.PARAGRAPH),
             "starts with text": self.BlockTypeTestScenario("Not a list\n- Item 1", BlockType.PARAGRAPH),
         }        
-        run_subtest_cases(self, block_to_block_type, test_cases)
+        run_subtest_cases_equal(self, block_to_block_type, test_cases)
 
     def test_ordered_lists(self):
         test_cases = {
@@ -81,7 +81,7 @@ class TestBlockToBlockType(unittest.TestCase):
             "some lines not numbered": self.BlockTypeTestScenario("1. First\n2. Second\n- Not numbered", BlockType.PARAGRAPH),
             "double digits": self.BlockTypeTestScenario("1. First\n2. Second\n10. Jump to ten", BlockType.PARAGRAPH),
         }
-        run_subtest_cases(self, block_to_block_type, test_cases)
+        run_subtest_cases_equal(self, block_to_block_type, test_cases)
 
     def test_paragraphs(self):
         test_cases = {
@@ -99,7 +99,7 @@ class TestBlockToBlockType(unittest.TestCase):
             "empty string": self.BlockTypeTestScenario("", BlockType.PARAGRAPH),
             "just whitespace": self.BlockTypeTestScenario("   \t  ", BlockType.PARAGRAPH),  # If whitespace isn't stripped
         }
-        run_subtest_cases(self, block_to_block_type, test_cases)
+        run_subtest_cases_equal(self, block_to_block_type, test_cases)
 
 
 class TestMarkupToHTML(unittest.TestCase):
@@ -129,7 +129,7 @@ class TestMarkupToHTML(unittest.TestCase):
                 "not heading zero": self.HTMLTestScenario(f"{no_hash}", ParentNode(Tags.p, text_to_children(no_hash))),
             }
         )
-        run_subtest_cases(self, block_to_html_node, test_cases)
+        run_subtest_cases_equal(self, block_to_html_node, test_cases)
 
     def test_code_blocks(self):
         simple = "print('hello')\n"
@@ -167,7 +167,7 @@ class TestMarkupToHTML(unittest.TestCase):
             #     f"{no_start}",
             #     ParentNode(Tags.p, text_to_children(no_start))),
         }
-        run_subtest_cases(self, block_to_html_node, test_cases)
+        run_subtest_cases_equal(self, block_to_html_node, test_cases)
 
     def test_quote_blocks(self):
         simple = "Don't worry, be happy"
@@ -202,7 +202,7 @@ class TestMarkupToHTML(unittest.TestCase):
                 ParentNode(Tags.p, text_to_children(no_quote))
             ),
         }
-        run_subtest_cases(self, block_to_html_node, test_cases)
+        run_subtest_cases_equal(self, block_to_html_node, test_cases)
 
     def test_unordered_list_blocks(self):
         list_items_content = ["First item", "Second item with *italic*", "Third item"]
@@ -268,7 +268,7 @@ class TestMarkupToHTML(unittest.TestCase):
                 ParentNode(Tags.p, text_to_children(' '.join(text_start))),
             ),
         }        
-        run_subtest_cases(self, block_to_html_node, test_cases)
+        run_subtest_cases_equal(self, block_to_html_node, test_cases)
 
     def test_ordered_lists(self):
         list_items_content = ("First item", "Second item with *bold*", "Third item")
@@ -362,7 +362,7 @@ class TestMarkupToHTML(unittest.TestCase):
                 ParentNode(Tags.p, text_to_children(' '.join(double_digits))),
             ),
         }
-        run_subtest_cases(self, block_to_html_node, test_cases)
+        run_subtest_cases_equal(self, block_to_html_node, test_cases)
 
     def test_paragraphs(self):
         simple = "Just some plain text"
@@ -388,7 +388,7 @@ class TestMarkupToHTML(unittest.TestCase):
             "empty string": self.HTMLTestScenario(empty_string, ParentNode(Tags.p, text_to_children(empty_string))),
             "just whitespace": self.HTMLTestScenario(whitespace, ParentNode(Tags.p, text_to_children(whitespace))),  # If whitespace isn't stripped
         }
-        run_subtest_cases(self, block_to_html_node, test_cases)
+        run_subtest_cases_equal(self, block_to_html_node, test_cases)
 
 
 if __name__ == "__main__":
