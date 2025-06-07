@@ -173,5 +173,5 @@ cython_debug/
 # PyPI configuration file
 .pypirc
 
-# static data folder
-.static
+# public data folder
+.public
