@@ -1,14 +1,13 @@
-from textnode import TextNode, TextType
+from file_operations import copy_dir
+
+
+dir_path_static = "./static"
+dir_path_public = "./public"
 
 
 def main():
-    text_node = TextNode(
-        text="This is some anchor text",
-        text_type=TextType.LINK,
-        url="https://www.boot.dev"
-    )
-    print(text_node)
-
+    print("Copying static files to public directory...")
+    copy_dir(dir_path_static, dir_path_public)
 
 if __name__ == "__main__":
     main()
